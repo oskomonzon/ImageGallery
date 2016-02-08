@@ -119,7 +119,7 @@ public class FullScreenImageGalleryActivity extends AppCompatActivity {
 
             ActionBar actionBar = getSupportActionBar();
             if(actionBar != null){
-                actionBar.setTitle(String.format("%d of %d", (position + 1), totalPages));
+                actionBar.setTitle(String.format("%d de %d", (position + 1), totalPages));
             }
         }
     }
