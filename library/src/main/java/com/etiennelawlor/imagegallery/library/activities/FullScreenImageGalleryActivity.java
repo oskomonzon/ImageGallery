@@ -7,28 +7,35 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.etiennelawlor.imagegallery.library.R;
 import com.etiennelawlor.imagegallery.library.adapters.FullScreenImageGalleryAdapter;
-import com.etiennelawlor.imagegallery.library.enums.PaletteColorType;
-import com.etiennelawlor.imagegallery.library.util.ImageGalleryUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FullScreenImageGalleryActivity extends AppCompatActivity {
+public class FullScreenImageGalleryActivity extends AppCompatActivity implements FullScreenImageGalleryAdapter.FullScreenImageLoader {
+
+    // region Constants
+    public static final String KEY_IMAGES = "KEY_IMAGES";
+    public static final String KEY_POSITION = "KEY_POSITION";
+    // endregion
+
+    // region Views
+    private Toolbar toolbar;
+    private ViewPager viewPager;
+    // endregion
 
     // region Member Variables
-    private List<String> mImages;
-    private int mPosition;
-    private PaletteColorType mPaletteColorType;
-
-    private Toolbar mToolbar;
-    private ViewPager mViewPager;
+    private List<String> images;
+    private int position;
+    private static FullScreenImageGalleryAdapter.FullScreenImageLoader fullScreenImageLoader;
     // endregion
 
     // region Listeners
-    private final ViewPager.OnPageChangeListener mViewPagerOnPageChangeListener = new ViewPager.OnPageChangeListener() {
+    private final ViewPager.OnPageChangeListener viewPagerOnPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -36,8 +43,8 @@ public class FullScreenImageGalleryActivity extends AppCompatActivity {
 
         @Override
         public void onPageSelected(int position) {
-            if (mViewPager != null) {
-                mViewPager.setCurrentItem(position);
+            if (viewPager != null) {
+                viewPager.setCurrentItem(position);
 
                 setActionBarTitle(position);
             }
@@ -59,7 +66,7 @@ public class FullScreenImageGalleryActivity extends AppCompatActivity {
 
         bindViews();
 
-        setSupportActionBar(mToolbar);
+        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -69,9 +76,8 @@ public class FullScreenImageGalleryActivity extends AppCompatActivity {
         if (intent != null) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                mImages = extras.getStringArrayList("images");
-                mPaletteColorType = (PaletteColorType) extras.get("palette_color_type");
-                mPosition = extras.getInt("position");
+                images = extras.getStringArrayList(KEY_IMAGES);
+                position = extras.getInt(KEY_POSITION);
             }
         }
 
@@ -95,37 +101,49 @@ public class FullScreenImageGalleryActivity extends AppCompatActivity {
         }
     }
 
+    // region FullScreenImageGalleryAdapter.FullScreenImageLoader Methods
+    @Override
+    public void loadFullScreenImage(ImageView iv, String imageUrl, int width, LinearLayout bglinearLayout) {
+        fullScreenImageLoader.loadFullScreenImage(iv, imageUrl, width, bglinearLayout);
+    }
+    // endregion
+
     // region Helper Methods
     private void bindViews() {
-        mViewPager = (ViewPager) findViewById(R.id.vp);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        viewPager = (ViewPager) findViewById(R.id.vp);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
     }
 
     private void setUpViewPager() {
-        ArrayList<String> images = new ArrayList<>();
-        images.addAll(mImages);
+        ArrayList<String> imageList = new ArrayList<>();
+        imageList.addAll(images);
 
-        FullScreenImageGalleryAdapter fullScreenImageGalleryAdapter = new FullScreenImageGalleryAdapter(images, mPaletteColorType);
-        mViewPager.setAdapter(fullScreenImageGalleryAdapter);
-        mViewPager.addOnPageChangeListener(mViewPagerOnPageChangeListener);
-        mViewPager.setCurrentItem(mPosition);
+        FullScreenImageGalleryAdapter fullScreenImageGalleryAdapter = new FullScreenImageGalleryAdapter(imageList);
+        fullScreenImageGalleryAdapter.setFullScreenImageLoader(this);
+        viewPager.setAdapter(fullScreenImageGalleryAdapter);
+        viewPager.addOnPageChangeListener(viewPagerOnPageChangeListener);
+        viewPager.setCurrentItem(position);
 
-        setActionBarTitle(mPosition);
+        setActionBarTitle(position);
     }
 
     private void setActionBarTitle(int position) {
-        if (mViewPager != null && mImages.size() > 1) {
-            int totalPages = mViewPager.getAdapter().getCount();
+        if (viewPager != null && images.size() > 1) {
+            int totalPages = viewPager.getAdapter().getCount();
 
             ActionBar actionBar = getSupportActionBar();
             if(actionBar != null){
-                actionBar.setTitle(String.format("%d de %d", (position + 1), totalPages));
+                actionBar.setTitle(String.format("%d/%d", (position + 1), totalPages));
             }
         }
     }
 
     private void removeListeners() {
-        mViewPager.removeOnPageChangeListener(mViewPagerOnPageChangeListener);
+        viewPager.removeOnPageChangeListener(viewPagerOnPageChangeListener);
+    }
+
+    public static void setFullScreenImageLoader(FullScreenImageGalleryAdapter.FullScreenImageLoader loader) {
+        fullScreenImageLoader = loader;
     }
     // endregion
 }
