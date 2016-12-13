@@ -1,7 +1,6 @@
 package com.etiennelawlor.imagegallery.library.adapters;
 
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import android.widget.ImageView;
 
 import com.etiennelawlor.imagegallery.library.R;
 import com.etiennelawlor.imagegallery.library.util.ImageGalleryUtils;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -20,21 +18,26 @@ import java.util.List;
 public class ImageGalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     // region Member Variables
-    private final List<String> mImages;
-    private int mGridItemWidth;
-    private int mGridItemHeight;
-    private OnImageClickListener mOnImageClickListener;
+    private final List<String> images;
+    private int gridItemWidth;
+    private int gridItemHeight;
+    private OnImageClickListener onImageClickListener;
+    private ImageThumbnailLoader imageThumbnailLoader;
     // endregion
 
     // region Interfaces
     public interface OnImageClickListener {
         void onImageClick(int position);
     }
+
+    public interface ImageThumbnailLoader {
+        void loadImageThumbnail(ImageView iv, String imageUrl, int dimension);
+    }
     // endregion
 
     // region Constructors
     public ImageGalleryAdapter(List<String> images) {
-        mImages = images;
+        this.images = images;
     }
     // endregion
 
@@ -50,17 +53,17 @@ public class ImageGalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         final ImageViewHolder holder = (ImageViewHolder) viewHolder;
 
-        String image = mImages.get(position);
+        String image = images.get(position);
 
-        setUpImage(holder.mImageView, image);
+        imageThumbnailLoader.loadImageThumbnail(holder.imageView, image, gridItemWidth);
 
-        holder.mFrameLayout.setOnClickListener(new View.OnClickListener() {
+        holder.frameLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int adapterPos = holder.getAdapterPosition();
                 if(adapterPos != RecyclerView.NO_POSITION){
-                    if (mOnImageClickListener != null) {
-                        mOnImageClickListener.onImageClick(adapterPos);
+                    if (onImageClickListener != null) {
+                        onImageClickListener.onImageClick(adapterPos);
                     }
                 }
             }
@@ -69,8 +72,8 @@ public class ImageGalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemCount() {
-        if (mImages != null) {
-            return mImages.size();
+        if (images != null) {
+            return images.size();
         } else {
             return 0;
         }
@@ -78,7 +81,11 @@ public class ImageGalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     // region Helper Methods
     public void setOnImageClickListener(OnImageClickListener listener) {
-        this.mOnImageClickListener = listener;
+        this.onImageClickListener = listener;
+    }
+
+    public void setImageThumbnailLoader(ImageThumbnailLoader loader) {
+        this.imageThumbnailLoader = loader;
     }
 
     private ViewGroup.LayoutParams getGridItemLayoutParams(View view) {
@@ -91,25 +98,13 @@ public class ImageGalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             numOfColumns = 3;
         }
 
-        mGridItemWidth = screenWidth / numOfColumns;
-        mGridItemHeight = screenWidth / numOfColumns;
+        gridItemWidth = screenWidth / numOfColumns;
+        gridItemHeight = screenWidth / numOfColumns;
 
-        layoutParams.width = mGridItemWidth;
-        layoutParams.height = mGridItemHeight;
+        layoutParams.width = gridItemWidth;
+        layoutParams.height = gridItemHeight;
 
         return layoutParams;
-    }
-
-    private void setUpImage(ImageView iv, String imageUrl) {
-        if (!TextUtils.isEmpty(imageUrl)) {
-            Picasso.with(iv.getContext())
-                    .load(imageUrl)
-                    .resize(mGridItemWidth, mGridItemHeight)
-                    .centerCrop()
-                    .into(iv);
-        } else {
-            iv.setImageDrawable(null);
-        }
     }
     // endregion
 
@@ -117,17 +112,17 @@ public class ImageGalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public static class ImageViewHolder extends RecyclerView.ViewHolder {
 
-        // region Member Variables
-        private final ImageView mImageView;
-        private final FrameLayout mFrameLayout;
+        // region Views
+        private final ImageView imageView;
+        private final FrameLayout frameLayout;
         // endregion
 
         // region Constructors
         public ImageViewHolder(final View view) {
             super(view);
 
-            mImageView = (ImageView) view.findViewById(R.id.iv);
-            mFrameLayout = (FrameLayout) view.findViewById(R.id.fl);
+            imageView = (ImageView) view.findViewById(R.id.iv);
+            frameLayout = (FrameLayout) view.findViewById(R.id.fl);
         }
         // endregion
     }
