@@ -91,13 +91,13 @@ public class ImageGalleryFragment extends Fragment implements ImageGalleryAdapte
 
         bindViews();
 
-        /*((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(false);
             actionBar.setTitle(title);
-        }*/
+        }
 
         setUpRecyclerView();
 
@@ -135,6 +135,7 @@ public class ImageGalleryFragment extends Fragment implements ImageGalleryAdapte
     private void bindViews() {
         recyclerView = (RecyclerView) getActivity().findViewById(R.id.rv);
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+		toolbar.setTitleTextColor(Color.parseColor("#80FFFFFF"));
     }
 
     private void setUpRecyclerView() {
