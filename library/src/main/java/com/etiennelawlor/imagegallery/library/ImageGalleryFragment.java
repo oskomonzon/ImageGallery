@@ -91,13 +91,13 @@ public class ImageGalleryFragment extends Fragment implements ImageGalleryAdapte
 
         bindViews();
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        /*((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle(title);
-        }
+        }*/
 
         setUpRecyclerView();
 
