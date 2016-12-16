@@ -1,6 +1,6 @@
 package com.etiennelawlor.imagegallery.library;
 
-
+import android.graphics.Color;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
