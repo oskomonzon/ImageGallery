@@ -136,7 +136,7 @@ public class ImageGalleryFragment extends Fragment implements ImageGalleryAdapte
         recyclerView = (RecyclerView) getActivity().findViewById(R.id.rv);
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
 		toolbar.setTitleTextColor(Color.parseColor("#FFEFEFEF"));
-		toolbar.setBackgroundColor(getResources().getColor(R.color.colorViviLight));
+		toolbar.setBackgroundColor(Color.parseColor("#FF00AEEF"));
     }
 
     private void setUpRecyclerView() {
